@@ -9,13 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class RootController {
-    @RequestMapping(value = "/")
-    public String getHomePage(Model model) {
-        List<String> messages = new ArrayList<>();
-        messages.add("Добро пожаловать!");
-        model.addAttribute("messages", messages);
-        return "helloPage";
+public class RootController
+{
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/login";
     }
 
     @GetMapping(value = "login")

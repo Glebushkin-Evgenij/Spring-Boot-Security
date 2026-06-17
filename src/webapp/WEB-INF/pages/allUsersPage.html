@@ -1,58 +1,183 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Все пользователи</title>
+    <title>Admin Panel - Users</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        .top-bar { background: #333; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1050; }
+        .sidebar { background: #f8f9fa; border-right: 1px solid #dee2e6; min-height: calc(100vh - 50px); position: fixed; left: 0; top: 50px; width: 250px; overflow-y: auto; }
+        .main-content { margin-left: 250px; padding-top: 20px; }
+    </style>
 </head>
-<body>
-<h2>Все пользователи</h2>
-<div>
-    <th:block th:include="menuPage">Menu</th:block>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<!-- Top bar -->
+
+
+<!-- Top bar -->
+<div class="top-bar">
+    <span th:text="${#request.userPrincipal.name} + ' with roles: ADMIN USER'">admin@mail.ru with roles: ADMIN USER</span>
+    <a href="/logout" class="text-white">Logout</a>
 </div>
-<div>
-    <table>
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Login</th>
-            <th>Password</th>
-            <th>Почтовый ящик</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-            <th>Роль</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="user : ${users}">
-            <td th:text="${user.getId()}">Id</td>
-            <td th:text="${user.getUsername()}">Login</td>
-            <td th:text="${user.getPassword()}">Password</td>
-            <td th:text="${user.getEmail()}">Почтовый ящик</td>
-            <td th:text="${user.getFirstName()}">Имя</td>
-            <td th:text="${user.getLastName()}">Фамилия</td>
-            <td>
-                <div th:each="role: ${user.getRoles()}">
-                    <span th:if="(${role.getName()} == 'ROLE_ADMIN')" th:utext="Администратор"></span>
-                    <span th:if="(${role.getName()} == 'ROLE_USER')" th:utext="Пользователь"></span>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin/all}">Admin</a>
+        <a class="nav-link" th:href="@{/user/lk}">User</a>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content flex-grow-1 p-4">
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/admin/all}">Users table</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/admin/add}">New User</a>
+            </li>
+        </ul>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <h5 class="card-header bg-light">All users</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered mb-0">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}">Id</td>
+                            <td th:text="${user.firstName}">Имя</td>
+                            <td th:text="${user.lastName}">Фамилия</td>
+                            <td th:text="${user.email}">Email</td>
+                            <td>
+                                <div th:each="role : ${user.roles}">
+                                    <span class="badge badge-secondary mr-1"
+                                          th:if="${role.name == 'ROLE_ADMIN'}">ADMIN</span>
+                                    <span class="badge badge-secondary mr-1"
+                                          th:if="${role.name == 'ROLE_USER'}">USER</span>
+                                </div>
+                            </td>
+                            <td>
+                                <!-- Кнопка Edit: обратите внимание на полный набор data-атрибутов -->
+                                <button type="button" class="btn btn-info btn-sm"
+                                        data-toggle="modal"
+                                        data-target="#editUserModal"
+                                        th:attr="data-id=${user.id},
+                                                 data-first-name=${user.firstName},
+                                                 data-last-name=${user.lastName},
+                                                 data-email=${user.email}">
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <form th:action="@{delete/{id}(id=${user.id})}" method="post">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </td>
-            <td>
-                <form th:action="@{edit/{id}(id=${user.getId()})}" th:object="${user}">
-                    <button type="submit">Изменить</button>
-                </form>
-            </td>
-            <td>
-                <form th:action="@{delete/{id}(id=${user.getId()})}" th:object="${user}">
-                    <input type="hidden" name="id" th:value="${user.getId()}">
-                    <button type="submit">Удалить</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <form th:action="@{add}">
-        <button type="submit">Добавить нового пользователя</button>
-    </form>
+            </div>
+        </div>
+    </main>
 </div>
+
+<!-- Модальное окно Edit user (одно на всю страницу) -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit user</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/admin/edit}" method="post">
+                    <!-- Скрытое поле для ID -->
+                    <input type="hidden" name="id" id="editUserId">
+                    <!-- CSRF токен для Spring Security -->
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+                    <div class="form-group">
+                        <label for="editFirstName">First name</label>
+                        <input type="text" class="form-control" id="editFirstName" name="firstName">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLastName">Last name</label>
+                        <input type="text" class="form-control" id="editLastName" name="lastName">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Password</label>
+                        <input type="password" class="form-control" id="editPassword" name="password" placeholder="Оставьте пустым, чтобы не менять">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select class="form-control" name="role">
+                            <option value="ROLE_ADMIN">ADMIN</option>
+                            <option value="ROLE_USER" selected>USER</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем библиотеки -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ВАЖНО: Этот скрипт должен быть ПОСЛЕ bootstrap.bundle.min.js -->
+<script>
+    $(document).ready(function() {
+    $('#editUserModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+
+            // Получаем данные из атрибутов кнопки
+            var id = button.data('id');
+            var firstName = button.data('first-name');
+            var lastName = button.data('last-name');
+            var email = button.data('email');
+
+            var modal = $(this);
+
+            // Заполняем поля модального окна
+            modal.find('#editUserId').val(id);
+            modal.find('#editFirstName').val(firstName);
+            modal.find('#editLastName').val(lastName);
+            modal.find('#editEmail').val(email);
+
+            // Очищаем поле пароля при каждом открытии, чтобы не светить старый
+            modal.find('#editPassword').val('');
+        });
+    });
+</script>
+
 </body>
 </html>

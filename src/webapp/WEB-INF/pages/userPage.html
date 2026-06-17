@@ -1,36 +1,82 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Данные пользователя</title>
+    <title>User information-page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        .top-bar { background: #333; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar { background: #f8f9fa; border-right: 1px solid #dee2e6; min-height: 100vh; }
+        .nav-link { color: #333; padding: 10px 20px; }
+        .nav-link.active { background: #007bff; color: #fff !important; }
+        .section-title { font-weight: 600; margin-bottom: 15px; }
+        .table-container { background: #fff; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; }
+        .table thead th { background: #f8f9fa; border-bottom: 1px solid #dee2e6; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .table tbody tr:nth-child(even) { background: #f8f9fa; }
+    </style>
 </head>
-<body>
-<div>
-    <th:block th:include="menuPage">Menu</th:block>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<!-- Top bar -->
+
+
+<!-- Top bar -->
+<div class="top-bar">
+    <span th:text="${#request.userPrincipal.name} + ' with roles: ADMIN USER'">admin@mail.ru with roles: ADMIN USER</span>
+    <a href="/logout" class="text-white">Logout</a>
 </div>
-<div>
-    <table>
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Login</th>
-            <th>Password</th>
-            <th>Почтовый ящик</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td th:text="${user.getId()}">Id</td>
-            <td th:text="${user.getUsername()}">Login</td>
-            <td th:text="${user.getPassword()}">Password</td>
-            <td th:text="${user.getEmail()}">Почтовый ящик</td>
-            <td th:text="${user.getFirstName()}">Имя</td>
-            <td th:text="${user.getLastName()}">Фамилия</td>
-        </tr>
-        </tbody>
-    </table>
+
+<div class="d-flex flex-grow-1">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin/all}">Admin</a>
+        <a class="nav-link" th:href="@{/user/lk}">User</a>
+    </nav>
+
+    <!-- Main content -->
+    <main class="flex-grow-1 p-4">
+        <h2 class="mb-4">User information-page</h2>
+
+        <div class="table-container">
+            <div class="section-title">About user</div>
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Если передаёте список: th:each="user : \${users}" -->
+                    <!-- Если передаёте одного: th:each="user : \${users}" тоже сработает (цикл по 1 элементу) -->
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}">Id</td>
+                        <td th:text="${user.firstName}">Имя</td>
+                        <td th:text="${user.lastName}">Фамилия</td>
+                        <td th:text="${user.email}">admin@mail.ru</td>
+                        <td>
+                            <div th:each="role : ${user.roles}">
+                                <span class="mr-1"
+                                      th:if="${role.name == 'ROLE_ADMIN'}">ADMIN</span>
+                                <span class="mr-1"
+                                      th:if="${role.name == 'ROLE_USER'}">USER</span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

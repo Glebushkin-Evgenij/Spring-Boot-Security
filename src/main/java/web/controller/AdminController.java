@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import web.model.Role;
 import web.model.User;
 import web.service.RoleService;
@@ -43,15 +44,39 @@ public class AdminController {
         return "addUser";
     }
 
+//    @PostMapping(value = "admin/add")
+//    public String postAddUser(@ModelAttribute("user") User user,
+//                              @RequestParam(required=false) String roleAdmin,
+//                              @RequestParam(required=false) String roleVIP) {
+//        Set<Role> roles = new HashSet<>();
+//        roles.add(roleService.getRoleByName("ROLE_USER"));
+//        if (roleAdmin != null && roleAdmin.equals("ROLE_ADMIN")) {
+//            roles.add(roleService.getRoleByName("ROLE_ADMIN"));
+//        }
+//        user.setRoles(roles);
+//        userService.addUser(user);
+//
+//        return "redirect:/admin";
+//    }
     @PostMapping(value = "admin/add")
     public String postAddUser(@ModelAttribute("user") User user,
-                              @RequestParam(required=false) String roleAdmin,
-                              @RequestParam(required=false) String roleVIP) {
+                              @RequestParam String role) { // принимаем один параметр role
         Set<Role> roles = new HashSet<>();
-        roles.add(roleService.getRoleByName("ROLE_USER"));
-        if (roleAdmin != null && roleAdmin.equals("ROLE_ADMIN")) {
-            roles.add(roleService.getRoleByName("ROLE_ADMIN"));
+
+        // Всегда добавляем USER (если это ваша логика)
+        Role userRole = roleService.getRoleByName("ROLE_USER");
+        if (userRole != null) {
+            roles.add(userRole);
         }
+
+        // Если выбрали ADMIN — добавляем и его
+        if ("ROLE_ADMIN".equals(role)) {
+            Role adminRole = roleService.getRoleByName("ROLE_ADMIN");
+            if (adminRole != null) {
+                roles.add(adminRole);
+            }
+        }
+
         user.setRoles(roles);
         userService.addUser(user);
 
@@ -71,25 +96,47 @@ public class AdminController {
         model.addAttribute("user", user);
         return "editUser";
     }
-    @PostMapping(value = "admin/edit")
-    public String postEditUser(@ModelAttribute("user") User user,
-                               @RequestParam(required=false) String roleAdmin,
-                               @RequestParam(required=false) String roleVIP) {
 
+    @PostMapping("/admin/edit")
+    public String postEditUser(@RequestParam Long id,
+                               @RequestParam String firstName,
+                               @RequestParam String lastName,
+                               @RequestParam String email,
+                               @RequestParam(required = false) String password,
+                               @RequestParam String role) {
+
+        User user = userService.getUserById(id);
+        if (user == null) {
+            // можно выбросить исключение или вернуть на страницу с ошибкой
+            return "redirect:/admin/all";
+        }
+
+        // Обновляем поля
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+
+        // Если пароль не пустой — обновляем
+        if (password != null && !password.isBlank()) {
+            user.setPassword(password); // в реальном проекте тут должно быть кодирование BCrypt
+        }
+
+        // Роли: по умолчанию всегда есть USER, при выборе ADMIN добавляем и его
         Set<Role> roles = new HashSet<>();
         roles.add(roleService.getRoleByName("ROLE_USER"));
-        if (roleAdmin != null && roleAdmin .equals("ROLE_ADMIN")) {
+        if ("ROLE_ADMIN".equals(role)) {
             roles.add(roleService.getRoleByName("ROLE_ADMIN"));
         }
         user.setRoles(roles);
+
         userService.editUser(user);
-        return "redirect:/admin";
+        return "redirect:/admin/all";
     }
 
-    @GetMapping("admin/delete/{id}")
+    @PostMapping("/admin/delete/{id}")
     public String deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return "redirect:/admin";
+        return "redirect:/admin/all";
     }
 
 }

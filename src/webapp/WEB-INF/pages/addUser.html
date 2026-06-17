@@ -2,70 +2,87 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Добавить пользователя</title>
+    <title>Admin panel - Add user</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        .top-bar { background: #333; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar { background: #f8f9fa; border-right: 1px solid #dee2e6; min-height: 100vh; }
+        .card { border: none; }
+        .form-group label { font-weight: 500; font-size: 0.9rem; }
+        .centered-form { max-width: 500px; margin: 0 auto; }
+    </style>
 </head>
-<body>
-<h2>Добавить пользователя</h2>
-<div>
-    <th:block th:include="menuPage">Menu</th:block>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Top bar -->
+<div class="top-bar">
+    <span th:text="${#request.userPrincipal.name} + ' with roles: ' + ${userRolesStr}">
+        admin@mail.ru with roles: ADMIN USER
+    </span>
+    <a href="/logout" class="text-white">Logout</a>
 </div>
-<div>
-    <form th:action="@{add}"
-          th:object="${user}"
-          method="post">
-        <fieldset>
-            <legend>Данные пользователя</legend>
-            <p>
-                <label th:for="username">Логин
-                    <input type="text"
-                           name="username"
-                           th:id="username">
-                </label>
-                <br/>
-                <label th:for="password">Пароль
-                    <input type="text"
-                           name="password"
-                           th:id="password">
-                </label>
-                <br/>
-                <label th:for="email">Почтовый ящик
-                    <input type="text"
-                           name="email"
-                           th:id="email">
-                </label>
-                <br/>
-                <label th:for="firsName">Имя
-                    <input type="text"
-                           name="firstName"
-                           th:id="firstName">
-                </label>
-                <br/>
-                <label th:for="lastName">Фамилия
-                    <input type="text"
-                           name="lastName"
-                           th:id="lastName">
-                </label>
-                <br/>
-                <label>
-                    <input type="checkbox"
-                           name="roleAdmin"
-                           th:value="ROLE_ADMIN"
-                           th:text="Администратор">
-                </label>
-                <label>
-                    <input type="checkbox"
-                           name="roleUser"
-                           th:value="ROLE_USER"
-                           th:text="Пользователь">
-                </label>
-            </p>
-        </fieldset>
-        <button type="submit">Сохранить пользователя</button>
-    </form>
-    <br/>
-    <form th:action="@{/admin/all}">
-        <button type="submit">Назад к списку пользователей</button>
-    </form>
+
+<div class="d-flex flex-grow-1">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <a class="nav-link active" th:href="@{/admin/all}">Admin</a>
+        <a class="nav-link" th:href="@{/user/lk}">User</a>
+    </nav>
+
+    <!-- Main content -->
+    <main class="flex-grow-1 p-4">
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/admin/all}">Users table</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">New User</a>
+            </li>
+        </ul>
+
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Add new user</h5>
+            </div>
+            <div class="card-body p-4">
+                <form class="centered-form" th:action="@{add}" th:object="${user}" method="post">
+                    <div class="form-group">
+                        <label for="firstName">First name</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" th:field="*{firstName}">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last name</label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" th:field="*{lastName}">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" th:field="*{email}">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Login</label>
+                        <input type="text" class="form-control" id="username" name="username" th:field="*{username}">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" th:field="*{password}">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select class="form-control" name="role">
+                            <option value="ROLE_ADMIN">ADMIN</option>
+                            <option value="ROLE_USER" selected>USER</option>
+                        </select>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-success">Add new user</button>
+
+                </form>
+            </div>
+        </div>
+    </main>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

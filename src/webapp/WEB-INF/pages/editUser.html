@@ -1,63 +1,176 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Изменить пользователя</title>
-</head>
-<body>
-<div>
-    <th:block th:include="menuPage">Menu</th:block>
-</div>
-<h2>Изменить пользователя</h2>
-<div>
-    <form th:action="@{/admin/edit}" th:object="${user}" method="post">
-        <input type="hidden" name="id" th:value="${user.getId()}">
-        <fieldset>
-            <legend>Данные пользователя</legend>
-            <p>
-                <label th:for="username">Логин
-                    <input type="text" name="username" th:id="username" th:value="${user.getUsername()}">
-                </label>
-                <br/>
-                <label th:for="password">Пароль
-                    <input type="text" name="password" th:id="password" th:value="${user.getPassword()}">
-                </label>
-                <br/>
-                <label th:for="email">Почтовый ящик
-                    <input type="text" name="email" th:id="email" th:value="${user.getEmail()}">
-                </label>
-                <br/>
-                <label th:for="name">Имя
-                    <input type="text" name="firstName" th:id="firstName" th:value="${user.getFirstName()}">
-                </label>
-                <br/>
-                <label th:for="lastName">Фамилия
-                    <input type="text" name="lastName" th:id="lastName" th:value="${user.getLastName()}">
-                </label>
-                <br/>
-                <label>
-                    <input type="checkbox"
-                           name="roleAdmin"
-                           th:checked="${roleAdmin}"
-                           th:value="ROLE_ADMIN"
-                           th:text="Администратор">
-                </label>
-                <label>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Все пользователи</title>-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">-->
+<!--    <style>-->
+<!--        .top-bar { background: #333; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }-->
+<!--        .sidebar { background: #f8f9fa; border-right: 1px solid #dee2e6; min-height: 100vh; }-->
+<!--        .nav-link.active { background: #007bff; color: #fff !important; }-->
+<!--        .nav-link:not(.active) { color: #333; }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body class="d-flex flex-column min-vh-100 bg-light">-->
 
-                    <input type="checkbox"
-                           name="roleUser"
-                           th:checked="${roleUser}"
-                           th:value="ROLE_USER"
-                           th:text="Пользователь">
-                </label>
-            </p>
-        </fieldset>
-        <button type="submit">Изменить данные</button>
-    </form>
-    <br/>
-    <form th:action="@{/admin/all}">
-        <button type="submit">Назад к списку пользователей</button>
-    </form>
-</div>
-</body>
-</html>
+<!--&lt;!&ndash; Top bar &ndash;&gt;-->
+<!--<div class="top-bar">-->
+<!--    <span th:text="\${#request.userPrincipal.name} + ' with roles: ADMIN USER'">admin@mail.ru with roles: ADMIN USER</span>-->
+<!--    <a href="/logout" class="text-white">Logout</a>-->
+<!--</div>-->
+
+<!--<div class="d-flex flex-grow-1">-->
+<!--    &lt;!&ndash; Sidebar &ndash;&gt;-->
+<!--    <nav class="sidebar d-flex flex-column p-3">-->
+<!--        <a class="nav-link active" th:href="@{/admin/all}">Admin</a>-->
+<!--        <a class="nav-link" th:href="@{/user/lk}">User</a>-->
+<!--    </nav>-->
+
+<!--    &lt;!&ndash; Main content &ndash;&gt;-->
+<!--    <main class="flex-grow-1 p-4">-->
+<!--        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">-->
+<!--            <li class="nav-item">-->
+<!--                <a class="nav-link active" th:href="@{/admin/all}">Users table</a>-->
+<!--            </li>-->
+<!--            <li class="nav-item">-->
+<!--                <a class="nav-link" th:href="@{/admin/add}">New User</a>-->
+<!--            </li>-->
+<!--        </ul>-->
+
+<!--        <div class="card shadow-sm">-->
+<!--            <div class="card-body p-0">-->
+<!--                <h5 class="card-header bg-light">All users</h5>-->
+<!--                <div class="table-responsive">-->
+<!--                    <table class="table table-striped table-bordered mb-0">-->
+<!--                        <thead class="thead-light">-->
+<!--                        <tr>-->
+<!--                            <th>ID</th>-->
+<!--                            <th>First Name</th>-->
+<!--                            <th>Last Name</th>-->
+<!--                            <th>Age</th>-->
+<!--                            <th>Email</th>-->
+<!--                            <th>Role</th>-->
+<!--                            <th>Edit</th>-->
+<!--                            <th>Delete</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        <tr th:each="user : ${users}">-->
+<!--                            <td th:text="${user.id}">Id</td>-->
+<!--                            <td th:text="${user.firstName}">Имя</td>-->
+<!--                            <td th:text="${user.lastName}">Фамилия</td>-->
+<!--                            <td th:text="${user.age}">Age</td>-->
+<!--                            <td th:text="${user.email}">Email</td>-->
+<!--                            <td>-->
+<!--                                <div th:each="role : ${user.roles}">-->
+<!--                                    <span class="badge badge-secondary mr-1"-->
+<!--                                          th:if="${role.name == 'ROLE_ADMIN'}">ADMIN</span>-->
+<!--                                    <span class="badge badge-secondary mr-1"-->
+<!--                                          th:if="${role.name == 'ROLE_USER'}">USER</span>-->
+<!--                                </div>-->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                                &lt;!&ndash; Кнопка Edit открывает модальное окно &ndash;&gt;-->
+<!--                                <button type="button" class="btn btn-info btn-sm"-->
+<!--                                        data-toggle="modal"-->
+<!--                                        data-target="#editUserModal"-->
+<!--                                        th:attr="data-id=${user.id},-->
+<!--                                                 data-first-name=${user.firstName},-->
+<!--                                                 data-last-name=${user.lastName},-->
+<!--                                                 data-age=${user.age},-->
+<!--                                                 data-email=${user.email}">-->
+<!--                                    Edit-->
+<!--                                </button>-->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                                <form th:action="@{delete/{id}(id=${user.id})}" method="post">-->
+<!--                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>-->
+<!--                                </form>-->
+<!--                            </td>-->
+<!--                        </tr>-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="card-footer">-->
+<!--                <a th:href="@{/admin/add}" class="btn btn-primary">Добавить нового пользователя</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </main>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; Модальное окно Edit user (одно на всю страницу) &ndash;&gt;-->
+<!--<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog" role="document">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="editUserModalLabel">Edit user</h5>-->
+<!--                <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                    <span aria-hidden="true">&times;</span>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <form th:action="@{/admin/edit}" th:object="${user}" method="post">-->
+<!--                    <input type="hidden" name="id" id="editUserId">-->
+
+<!--                    <div class="form-group">-->
+<!--                        <label for="editFirstName">First name</label>-->
+<!--                        <input type="text" class="form-control" id="editFirstName" name="firstName">-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="editLastName">Last name</label>-->
+<!--                        <input type="text" class="form-control" id="editLastName" name="lastName">-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="editAge">Age</label>-->
+<!--                        <input type="number" class="form-control" id="editAge" name="age">-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="editEmail">Email</label>-->
+<!--                        <input type="email" class="form-control" id="editEmail" name="email">-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="editPassword">Password</label>-->
+<!--                        <input type="password" class="form-control" id="editPassword" name="password" placeholder="Оставьте пустым, чтобы не менять">-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label>Role</label>-->
+<!--                        <select class="form-control" name="role">-->
+<!--                            <option value="ROLE_ADMIN">ADMIN</option>-->
+<!--                            <option value="ROLE_USER">USER</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+
+<!--                    <div class="modal-footer">-->
+<!--                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+<!--                        <button type="submit" class="btn btn-primary">Edit</button>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--<script>-->
+<!--    // Заполняем модальное окно данными из строки таблицы-->
+<!--    $('#editUserModal').on('show.bs.modal', function (event) {-->
+<!--        var button = $(event.relatedTarget);-->
+<!--        var id = button.data('id');-->
+<!--        var firstName = button.data('first-name');-->
+<!--        var lastName = button.data('last-name');-->
+<!--        var age = button.data('age');-->
+<!--        var email = button.data('email');-->
+
+<!--        var modal = $(this);-->
+<!--        modal.find('#editUserId').val(id);-->
+<!--        modal.find('#editFirstName').val(firstName);-->
+<!--        modal.find('#editLastName').val(lastName);-->
+<!--        modal.find('#editAge').val(age);-->
+<!--        modal.find('#editEmail').val(email);-->
+<!--        // Password и Role не заполняем из строки (пароль не показываем, роль берём дефолтную)-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
