@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="spring-mvc-hibernate2" />
         <module name="spring-mvc-hibernate" />
+        <module name="spring-mvc-security-hibernate" />
       </profile>
     </annotationProcessing>
   </component>

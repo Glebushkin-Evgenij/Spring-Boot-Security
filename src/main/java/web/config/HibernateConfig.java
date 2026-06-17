@@ -23,7 +23,6 @@ import java.util.Properties;
 @PropertySource("classpath:app.properties")
 
 @EnableJpaRepositories("web")
-//@ComponentScan(value = "web")
 
 public class HibernateConfig {
     private static final String PROP_DATABASE_DRIVER = "db.driver";
@@ -54,7 +53,6 @@ public class HibernateConfig {
         factoryBean.setJpaVendorAdapter(getJpaVendorAdapter());
         factoryBean.setDataSource(getDataSource());
         factoryBean.setPersistenceUnitName("myJpaPersistenceUnit");
-        //factoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
         factoryBean.setPackagesToScan(env.getRequiredProperty(PROP_ENTITYMANAGER_PACKAGES_TO_SCAN));
         factoryBean.setJpaProperties(getHibernateProperties());
         return factoryBean;

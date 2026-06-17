@@ -52,9 +52,6 @@ public class AdminController {
         if (roleAdmin != null && roleAdmin.equals("ROLE_ADMIN")) {
             roles.add(roleService.getRoleByName("ROLE_ADMIN"));
         }
-        if (roleVIP != null && roleVIP.equals("ROLE_VIP")) {
-            roles.add(roleService.getRoleByName("ROLE_VIP"));
-        }
         user.setRoles(roles);
         userService.addUser(user);
 
@@ -70,9 +67,6 @@ public class AdminController {
             if (role.equals(roleService.getRoleByName("ROLE_ADMIN"))) {
                 model.addAttribute("roleAdmin", true);
             }
-            if (role.equals(roleService.getRoleByName("ROLE_VIP"))) {
-                model.addAttribute("roleVIP", true);
-            }
         }
         model.addAttribute("user", user);
         return "editUser";
@@ -86,9 +80,6 @@ public class AdminController {
         roles.add(roleService.getRoleByName("ROLE_USER"));
         if (roleAdmin != null && roleAdmin .equals("ROLE_ADMIN")) {
             roles.add(roleService.getRoleByName("ROLE_ADMIN"));
-        }
-        if (roleVIP != null && roleVIP.equals("ROLE_VIP")) {
-            roles.add(roleService.getRoleByName("ROLE_VIP"));
         }
         user.setRoles(roles);
         userService.editUser(user);

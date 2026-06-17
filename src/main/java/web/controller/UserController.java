@@ -21,14 +21,6 @@ public class UserController {
         this.userService = userService;
     }
 
-//    @GetMapping(value = "/")
-//    public String getUserPage(ModelMap modelMap) {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        modelMap.addAttribute("user", user);
-//        return "userPage";
-//    }
-
-
 
     @GetMapping(value = "/lk")
     public String getUserPage2(ModelMap modelMap, Principal principal) {
