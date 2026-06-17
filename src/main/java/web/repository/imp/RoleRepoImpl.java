@@ -26,7 +26,7 @@ public class RoleRepoImpl implements RoleRepo {
                     .setParameter("name", name)
                     .getSingleResult();
         } catch (Exception e) {
-            System.out.println("Роли с таким именем не существует!");
+            System.out.println("Такой роли нет!");
         }
         return role;
     }

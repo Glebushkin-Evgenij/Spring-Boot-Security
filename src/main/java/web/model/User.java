@@ -159,8 +159,8 @@ public class User implements Serializable, UserDetails {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", first_Name='" + firstName + '\'' +
+                ", last_Name='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", roles=" + roles +
                 '}';

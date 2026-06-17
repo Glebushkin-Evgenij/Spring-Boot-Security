@@ -34,7 +34,7 @@ public class UserRepoImpl implements UserRepo {
                 getEntityManager().remove(user);
             }
         } catch (NullPointerException e) {
-            System.out.println("User с указанным вами id не существует!");
+            System.out.println("Такого пользователя не существует!");
         }
     }
 
